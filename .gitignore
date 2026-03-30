@@ -1,0 +1,14 @@
+# Ignore dependencies
+node_modules/
+Backend/node_modules/
+Frontend/sprint_planner/node_modules/
+
+# Ignore environment variables
+.env
+
+# Ignore build folders
+dist/
+build/
+
+# OS files
+.DS_Store
