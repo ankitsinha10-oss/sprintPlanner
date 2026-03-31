@@ -6,8 +6,10 @@ const AddTaskModal = ({ show, onClose, sprintId, sprintEmployees, initialStatus,
     taskname: '',
     desc: '',
     assignedTo: '',
-    status: initialStatus,
-    dueDate: ''
+    status: '',
+    dueDate: '',
+    startDate: '',
+    endDate: ''
   });
 
   if (!show) return null;
@@ -15,7 +17,7 @@ const AddTaskModal = ({ show, onClose, sprintId, sprintEmployees, initialStatus,
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:8000/tasks', {
+      const res = await axios.post('http://localhost:8000/task', {
         ...taskData,
         sprint: sprintId,
         status: initialStatus // Ensures it lands in the column you clicked
@@ -36,10 +38,28 @@ const AddTaskModal = ({ show, onClose, sprintId, sprintEmployees, initialStatus,
             <button type="button" className="btn-close" onClick={onClose}></button>
           </div>
           <form onSubmit={handleSubmit}>
-            <div className="modal-body">
+            <div className="modal-body"> 
               <div className="mb-3">
                 <label className="form-label">Task Name</label>
                 <input type="text" className="form-control" required onChange={(e) => setTaskData({...taskData, taskname: e.target.value})} />
+              </div>
+              <div className="mb-3">
+                <label className="form-label">Task Description</label>
+                <input type="text" className="form-control" required onChange={(e) => setTaskData({...taskData, desc: e.target.value})} />
+              </div>
+              {/* <div className="mb-3">
+                <label className="form-label">Sprint Name</label>
+                <input type="text" className="form-control" required onChange={(e) => setTaskData({...taskData, taskname: e.target.value})} />
+              </div> */}
+
+              <div className="mb-3">
+                <label className="form-label fw-semibold">Initial Status</label>
+                <select name="status" className="form-select" required onChange={(e) => setTaskData({...taskData, status: e.target.value})}>
+                  <option value="planning">ToDo</option>
+                  <option value="ongoing">Inprogress</option>
+                  <option value="ongoing">Completed</option>
+                  <option value="ongoing">Overdue</option>
+                </select>
               </div>
               <div className="mb-3">
                 <label className="form-label">Assign To Member</label>
@@ -53,6 +73,14 @@ const AddTaskModal = ({ show, onClose, sprintId, sprintEmployees, initialStatus,
               <div className="mb-3">
                 <label className="form-label">Due Date</label>
                 <input type="date" className="form-control" onChange={(e) => setTaskData({...taskData, dueDate: e.target.value})} />
+              </div>
+              <div className="mb-3">
+                <label className="form-label">Start Date</label>
+                <input type="date" className="form-control" onChange={(e) => setTaskData({...taskData, startDate: e.target.value})} />
+              </div>
+              <div className="mb-3">
+                <label className="form-label">End Date</label>
+                <input type="date" className="form-control" onChange={(e) => setTaskData({...taskData, endDate: e.target.value})} />
               </div>
             </div>
             <div className="modal-footer">

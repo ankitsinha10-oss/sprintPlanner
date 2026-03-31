@@ -25,6 +25,7 @@ const [selectedStatus, setSelectedStatus] = useState('todo');
         const empRes = await axios.get(`http://localhost:8000/employees`);
         setAllEmployees(empRes.data);
         const taskRes = await axios.get(`http://localhost:8000/tasks?sprintId=${id}`);
+        
       setTasks(taskRes.data);
       } catch (err) {
         console.error("Fetch error:", err);
@@ -100,14 +101,14 @@ const handleOpenTaskModal = (status) => {
       </div>
       
 {/* 1. THE GLOBAL + ADD TASK BUTTON (Sit here!) */}
-      {/* <button 
+      <button 
         className="btn btn-white text-dark d-flex flex-column align-items-center justify-content-center p-3 rounded-3 border fw-bold shadow-sm"
         style={{ width: '80px', height: '80px', borderStyle: 'solid' }}
         onClick={() => handleOpenTaskModal('todo')} // You can default it to 'todo'
       >
         <span className="fs-3">+</span>
         <span className="small">Add task</span>
-      </button> */}
+      </button>
 
 <ul className="nav nav-tabs border-0 mb-4">
         {['overview', 'team', 'board', 'gantt'].map(tab => (
@@ -244,13 +245,7 @@ const handleOpenTaskModal = (status) => {
           </div>
 
           {/* THE ADD TASK BUTTON: Styled like your "Add Employee" buttons */}
-          {/* <button 
-  className="btn btn-white w-100 py-3 border-dashed border-2 rounded-3 text-muted fw-bold d-flex align-items-center justify-content-center bg-white shadow-sm mt-2"
-  style={{ borderStyle: 'dashed' }}
-  onClick={() => handleOpenTaskModal(status)} // This calls the function above
->
-  <span className="me-2 fs-4">+</span> Add Task
-</button> */}
+          
         </div>
       </div>
     ))}

@@ -13,7 +13,7 @@ app.use(express.json());
 
 app.use("/employees", employeeRoutes);
 app.use("/sprint", sprintRoutes);
-app.use("/task", taskRoutes);
+app.use("/tasks", taskRoutes);
 
 app.get("/", (req, res) => {
  res.send("API is running");

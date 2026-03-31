@@ -30,10 +30,10 @@ const taskSchema = new mongoose.Schema(
       type: String,
 
       enum: ['todo', 'inprogress', 'completed', 'overdue'],
-      
+
       default: 'todo'
   },
-    duedate: {
+    dueDate: {
         type: Date,
         default: Date.now
     },
