@@ -14,6 +14,18 @@ const employeeId = count + 1;
 res.json(employee); 
 });
 
+// Get a single employee by ID
+router.get("/:id", async (req, res) => {
+  try {
+    const employee = await Employee.findById(req.params.id);
+    if (!employee) return res.status(404).json({ message: "Employee not found" });
+    res.json(employee);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
 router.get("/", async (req, res) => {
   const employees = await Employee.find();
   res.json(employees);

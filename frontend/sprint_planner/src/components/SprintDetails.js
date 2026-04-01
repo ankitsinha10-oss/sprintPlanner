@@ -1,19 +1,80 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AddTaskModal from '../modals/AddTaskModal';
+import EditSprintModal from '../modals/EditSprintModal';
+import EditTaskModal from '../modals/EditTaskModals';
 
 const SprintDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [sprint, setSprint] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [allEmployees, setAllEmployees] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const [showEditModal, setShowEditModal] = useState(false);
   // State to control the Task Modal visibility
   const [showTaskModal, setShowTaskModal] = useState(false);
 // State to remember which column we are adding to
 const [selectedStatus, setSelectedStatus] = useState('todo');
 
+const [showEditTaskModal, setShowEditTaskModal] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState(null);
+
+
+
+// 1. DELETE SPRINT
+  const handleDelete = async () => {
+    if (window.confirm("Are you sure you want to delete this sprint? This cannot be undone.")) {
+      try {
+        await axios.delete(`http://localhost:8000/sprint/${id}`);
+        alert("Sprint deleted successfully");
+        navigate('/sprints'); // Go back to list
+      } catch (err) {
+        console.error("Delete error:", err);
+      }
+    }
+  };
+
+  // 2. MARK AS COMPLETE
+  const handleMarkComplete = async () => {
+    try {
+      const res = await axios.patch(`http://localhost:8000/sprint/${id}/status`, {
+        status: 'completed'
+      });
+      setSprint(res.data); // Update UI immediately
+      alert("Sprint marked as completed!");
+    } catch (err) {
+      console.error("Update error:", err);
+    }
+  };
+
+  // 3. EDIT SPRINT (Placeholder for now)
+  const handleEdit = () => {
+    alert("ruko modals bnane to do wait");
+    setShowEditModal(true)
+  };
+
+  const onSprintUpdated = (updatedSprint) => {
+    setSprint(updatedSprint); 
+    // Updates UI with new data from modal
+  };
+
+
+  // 3. TASK HANDLERS
+  const handleOpenEditTaskModal = (task) => {
+    setTaskToEdit(task);
+    setShowEditTaskModal(true);
+  };
+
+  const onTaskUpdated = (updatedTask) => {
+    setTasks(tasks.map(t => t._id === updatedTask._id ? updatedTask : t));
+  };
+
+
+  const onTaskDeleted = (deletedId) => {
+    setTasks(tasks.filter(t => t._id !== deletedId));
+  };
 
   console.log("Loading SprintDetails for ID:", id); 
 
@@ -59,21 +120,21 @@ if (!sprint) {
     }
   };
 
-//  const delSprint = async (empId) => {
-//     try {
-//       // We send a PUT request to the backend with the Employee's ID
-//       const response = await axios.put(`http://localhost:8000/sprint/${id}`, {
-//         employeeId: null
-//       });
+ const delEmployeeToSprint = async (empId) => {
+    try {
+      // We send a PUT request to the backend with the Employee's ID
+      const response = await axios.delete(`http://localhost:8000/sprint/${id}`, {
+        employeeId: null
+      });
       
-//       // We update the local state with the new data from the server
-//       // This makes the person jump from the "Add" list to the "Assigned" list instantly
-//       setSprint(response.data);
-//     } catch (err) {
-//       console.error("Error adding employee:", err);
-//       alert("Could not add employee. Make sure the backend route exists.");
-//     }
-//   };
+      // We update the local state with the new data from the server
+      // This makes the person jump from the "Add" list to the "Assigned" list instantly
+      setSprint(response.data);
+    } catch (err) {
+      console.error("Error adding employee:", err);
+      alert("Could not delete employee. Make sure the backend route exists.");
+    }
+  };
 
 
 
@@ -94,10 +155,25 @@ const handleOpenTaskModal = (status) => {
           </span>
         </div>
         <div className="btn-group">
-          <button className="btn btn-outline-secondary btn-sm px-3">Edit sprint</button>
-          <button className="btn btn-outline-secondary btn-sm px-3 mx-2">Mark complete</button>
-          <button className="btn btn-outline-danger btn-sm px-3">Delete</button>
-        </div>
+          <button 
+            className="btn btn-outline-secondary btn-sm px-3" 
+            onClick={handleEdit}
+          >
+            Edit sprint
+          </button>
+          <button 
+            className="btn btn-outline-secondary btn-sm px-3 mx-2" 
+            onClick={handleMarkComplete}
+            disabled={sprint.status === 'completed'} // Disable if already done
+          >
+            Mark complete
+          </button>
+          <button 
+            className="btn btn-outline-danger btn-sm px-3" 
+            onClick={handleDelete}
+          >
+            Delete
+          </button> </div>
       </div>
       
 {/* 1. THE GLOBAL + ADD TASK BUTTON (Sit here!) */}
@@ -167,7 +243,7 @@ const handleOpenTaskModal = (status) => {
                   <div className="small text-muted">{emp.role}</div>
                 </div>
               </div>
-              <button className="btn btn-link text-danger text-decoration-none btn-sm">Remove</button>
+              <button className="btn btn-link text-danger text-decoration-none btn-sm "onClick={() => delEmployeeToSprint(emp._id)}>Remove</button>
             </div>
           ))
         ) : (
@@ -183,7 +259,7 @@ const handleOpenTaskModal = (status) => {
       <h5 className="fw-bold mb-3 text-dark">Add to team</h5>
       <p className="small text-muted mb-3">Select an employee from the company directory to add to this sprint.</p>
       
-      <div className="list-group border rounded-3 overflow-hidden" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+      <div className="list-group border rounded-3 overflow-auto" style={{ maxHeight: '300px', overflowY: 'auto' }}>
         {/* Optional: Filter out people already in the sprint */}
         {allEmployees.filter(emp => !sprint.employees.some(existing => existing._id === emp._id))
           .map(emp => (
@@ -191,6 +267,7 @@ const handleOpenTaskModal = (status) => {
               key={emp._id}
               className="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 border-light"
               onClick={() => addEmployeeToSprint(emp._id)}
+              
             >
               <div className="d-flex align-items-center">
                 <div className="bg-light text-dark rounded-circle d-flex align-items-center justify-content-center me-3 border" style={{width: '32px', height: '32px', fontSize: '0.8rem'}}>
@@ -221,7 +298,8 @@ const handleOpenTaskModal = (status) => {
           {/* Task Cards */}
           <div className="task-list">
             {tasks.filter(t => t.status === status).map(task => (
-              <div key={task._id} className="card border-0 shadow-sm mb-3 rounded-3 overflow-hidden">
+              <div key={task._id} className="card border-0 shadow-sm mb-3 rounded-3 overflow-hidden"style={{ cursor: 'pointer' }}
+                      onClick={() => handleOpenEditTaskModal(task)}>
                 <div className="card-body p-3">
                   <h6 className="fw-bold mb-2">{task.taskname}</h6>
                   <p className="small text-muted mb-3 text-truncate">{task.desc}</p>
@@ -251,6 +329,23 @@ const handleOpenTaskModal = (status) => {
     ))}
   </div>
 )}
+
+<EditTaskModal 
+        show={showEditTaskModal} 
+        onClose={() => setShowEditTaskModal(false)} 
+        task={taskToEdit} 
+        sprintEmployees={sprint.employees} 
+        onTaskUpdated={onTaskUpdated} 
+        onTaskDeleted={onTaskDeleted} 
+      />
+
+
+<EditSprintModal 
+        show={showEditModal} 
+        onClose={() => setShowEditModal(false)} 
+        sprint={sprint} 
+        onSprintUpdated={onSprintUpdated} 
+      />
 
       </div>
 

@@ -74,4 +74,26 @@ router.get("/", async (req, res) => {
   }
 });
 
+
+// 1. UPDATE TASK
+router.put("/:id", async (req, res) => {
+  try {
+    const updatedTask = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true })
+      .populate('assignedTo'); // Important to keep the name visible on the board
+    res.json(updatedTask);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// 2. DELETE TASK
+router.delete("/:id", async (req, res) => {
+  try {
+    await Task.findByIdAndDelete(req.params.id);
+    res.json({ message: "Task deleted" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 export default router;
