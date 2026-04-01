@@ -1,9 +1,20 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const EmployeeItem = ({ employee }) => {
+    const navigate = useNavigate();
+
+    const handleViewProfile = () => {
+        navigate(`/employee/${employee._id}`);
+    };
+
     return (
         <div className="col-md-4 mb-4">
-            <div className="card border-0 shadow-sm h-100 p-3">
+           <div 
+                className="card border-0 shadow-sm h-100 p-3" 
+                onClick={handleViewProfile} 
+                style={{ cursor: 'pointer' }}
+            >
                 <div className="card-body">
                     <div className="d-flex align-items-center mb-3">
                         <div className="rounded-circle bg-info-subtle text-info d-flex align-items-center justify-content-center fw-bold me-3" 
@@ -23,7 +34,7 @@ const EmployeeItem = ({ employee }) => {
 
                     <div className="d-flex justify-content-between align-items-center mt-auto pt-2">
                         <small className="text-muted">ID: #{employee.employeeId}</small>
-                        <button className="btn btn-outline-dark btn-sm rounded-pill px-3">View Profile</button>
+                        {/* <button className="btn btn-outline-dark btn-sm rounded-pill px-3">View Profile</button> */}
                     </div>
                 </div>
             </div>

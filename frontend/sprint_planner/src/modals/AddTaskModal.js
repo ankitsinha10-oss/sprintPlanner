@@ -17,7 +17,7 @@ const AddTaskModal = ({ show, onClose, sprintId, sprintEmployees, initialStatus,
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:8000/task', {
+      const res = await axios.post('http://localhost:8000/tasks', {
         ...taskData,
         sprint: sprintId,
         status: initialStatus // Ensures it lands in the column you clicked

@@ -73,4 +73,45 @@ router.get("/", async (req, res) => {
   res.json(sprint);
 });
 
+
+// DELETE a sprint
+router.delete("/:id", async (req, res) => {
+  await Sprint.findByIdAndDelete(req.params.id);
+  res.json({ message: "Sprint deleted" });
+});
+
+// UPDATE sprint status (for Mark Complete)
+router.patch("/:id/status", async (req, res) => {
+  const updated = await Sprint.findByIdAndUpdate(
+    req.params.id, 
+    { status: req.body.status }, 
+    { new: true }
+  ).populate("employees");
+  res.json(updated);
+});
+
+// update the sprint
+router.put("/:id", async (req, res) => {
+  try {
+    const updatedSprint = await Sprint.findByIdAndUpdate(
+      req.params.id,
+      {
+        sprintname: req.body.sprintname,
+        goal: req.body.goal,
+        startDate: req.body.startDate,
+        endDate: req.body.endDate
+      },
+      { new: true } // This returns the modified document rather than the original
+    ).populate("employees"); // Populate if you need the team list back
+
+    if (!updatedSprint) {
+      return res.status(404).json({ message: "Sprint not found" });
+    }
+
+    res.json(updatedSprint);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
 export default router;
