@@ -123,8 +123,8 @@ if (!sprint) {
  const delEmployeeToSprint = async (empId) => {
     try {
       // We send a PUT request to the backend with the Employee's ID
-      const response = await axios.delete(`http://localhost:8000/sprint/${id}`, {
-        employeeId: null
+      const response = await axios.put(`http://localhost:8000/sprint/${id}/remove-employee`, {
+        employeeId: empId
       });
       
       // We update the local state with the new data from the server
@@ -142,6 +142,34 @@ const handleOpenTaskModal = (status) => {
   setSelectedStatus(status); // Set status to 'todo', 'inprogress', or 'completed'
   setShowTaskModal(true);    // Open the modal
 };
+
+
+// Logic to calculate progress per employee based on tasks
+  const getEmployeeTaskStats = (empId) => {
+    const empTasks = tasks.filter(t => t.assignedTo?._id === empId || t.assignedTo === empId);
+    const total = empTasks.length;
+    const completed = empTasks.filter(t => t.status === 'completed').length;
+    const percent = total > 0 ? (completed / total) * 100 : 0;
+    
+    let color = 'bg-danger';
+    if (percent >= 40 && percent < 80) color = 'bg-warning';
+    if (percent >= 80) color = 'bg-success';
+
+    return { completed, total, percent, color};
+  };
+
+  // Handler to update the global role of an employee
+  const handleChangeRole = async (empId) => {
+    const newRole = prompt("Enter new role for this employee:");
+    if (!newRole) return;
+    try {
+      await axios.patch(`http://localhost:8000/employees/${empId}/role`, { role: newRole });
+      const res = await axios.get(`http://localhost:8000/sprint/${id}`);
+      setSprint(res.data);
+    } catch (err) {
+      console.error("Error updating role:", err);
+    }
+  };
 
 
   return (
@@ -179,10 +207,10 @@ const handleOpenTaskModal = (status) => {
 {/* 1. THE GLOBAL + ADD TASK BUTTON (Sit here!) */}
       <button 
         className="btn btn-white text-dark d-flex flex-column align-items-center justify-content-center p-3 rounded-3 border fw-bold shadow-sm"
-        style={{ width: '80px', height: '80px', borderStyle: 'solid' }}
+        style={{ width: '80px', height: '100px', paddingBottom: '10px', borderStyle: 'solid' }}
         onClick={() => handleOpenTaskModal('todo')} // You can default it to 'todo'
       >
-        <span className="fs-3">+</span>
+        <span className="fs-3">+ </span>
         <span className="small">Add task</span>
       </button>
 
@@ -203,6 +231,7 @@ const handleOpenTaskModal = (status) => {
       {/* Tab Content */}
       <div className="tab-content">
         {activeTab === 'overview' && (
+
           <div className="row g-4">
             <div className="col-md-8">
               <div className="card border-0 shadow-sm p-4 mb-4">
@@ -225,63 +254,111 @@ const handleOpenTaskModal = (status) => {
           </div>
         )}
 
-        {activeTab === 'team' && (
-  <div className="card border-0 shadow-sm p-4">
-    {/* SECTION 1: Current Assigned Members */}
-    <div className="mb-5">
-      <h5 className="fw-bold mb-4 text-dark">Assigned members</h5>
-      <div className="list-group list-group-flush">
-        {sprint.employees && sprint.employees.length > 0 ? (
-          sprint.employees.map(emp => (
-            <div key={emp._id} className="list-group-item d-flex justify-content-between align-items-center py-3 border-light px-0">
-              <div className="d-flex align-items-center">
-                <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 fw-bold" style={{width: '40px', height: '40px'}}>
-                  {emp.name.charAt(0)}
-                </div>
-                <div>
-                  <div className="fw-bold">{emp.name}</div>
-                  <div className="small text-muted">{emp.role}</div>
-                </div>
-              </div>
-              <button className="btn btn-link text-danger text-decoration-none btn-sm "onClick={() => delEmployeeToSprint(emp._id)}>Remove</button>
+     {activeTab === 'team' && (
+          <div className="py-2">
+            {/* Header section with Stats */}
+            <div className="d-flex justify-content-between align-items-center mb-4">
+              <h5 className="fw-bold mb-0">Assigned members</h5>
+              <span className="text-muted small">
+                {sprint.employees.length} of {allEmployees.length} company employees
+              </span>
             </div>
-          ))
-        ) : (
-          <p className="text-muted italic">No one assigned yet.</p>
-        )}
-      </div>
-    </div>
 
-    <hr className="my-4 text-secondary opacity-25" />
+            <div className="assigned-members-list">
+              {sprint.employees && sprint.employees.length > 0 ? (
+                sprint.employees.map(emp => {
+                  const stats = getEmployeeTaskStats(emp._id);
+                  return (
+                    <div key={emp._id} className="card border-light shadow-sm mb-3 rounded-4">
+                      <div className="card-body p-3 d-flex align-items-center">
+                        
+                        {/* Avatar & Info Section */}
+                        <div className="d-flex align-items-center" style={{ flex: '2' }}>
+                          <div className="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center me-3 fw-bold" 
+                               style={{ width: '48px', height: '48px', flexShrink: 0 }}>
+                            {emp.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="text-truncate">
+                            <h6 className="mb-0 fw-bold text-dark">{emp.name}</h6>
+                            <small className="text-muted text-truncate d-block">
+                              {emp.email} · {emp.role}
+                            </small>
+                          </div>
+                        </div>
 
-    {/* SECTION 2: Add New Members (Now Below) */}
-    <div>
-      <h5 className="fw-bold mb-3 text-dark">Add to team</h5>
-      <p className="small text-muted mb-3">Select an employee from the company directory to add to this sprint.</p>
-      
-      <div className="list-group border rounded-3 overflow-auto" style={{ maxHeight: '300px', overflowY: 'auto' }}>
-        {/* Optional: Filter out people already in the sprint */}
-        {allEmployees.filter(emp => !sprint.employees.some(existing => existing._id === emp._id))
-          .map(emp => (
-            <button 
-              key={emp._id}
-              className="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 border-light"
-              onClick={() => addEmployeeToSprint(emp._id)}
+                        {/* Role Badge Section */}
+                        <div className="px-3 text-center" style={{ flex: '1' }}>
+                          <span className="badge rounded-pill bg-primary-subtle text-primary px-3 fw-medium">
+                            {emp.role}
+                          </span>
+                        </div>
+
+                        {/* Task Progress Bar Section */}
+                        <div className="d-flex align-items-center px-4" style={{ flex: '2' }}>
+                          <div className="progress w-100 rounded-pill bg-light me-3" style={{ height: '8px' }}>
+                            <div 
+                              className={`progress-bar rounded-pill ${stats.color}`} 
+                              style={{ width: `${stats.percent}%`, transition: 'width 0.5s ease' }}
+                            ></div>
+                          </div>
+                          <small className="fw-bold text-secondary" style={{ minWidth: '40px' }}>
+                            {stats.completed}/{stats.total}
+                          </small>
+                        </div>
+
+                        {/* Action Buttons Section */}
+                        <div className="d-flex gap-2 justify-content-end" style={{ flex: '1.5' }}>
+                          <button 
+                            className="btn btn-outline-dark btn-sm rounded-3 px-3 fw-semibold"
+                            onClick={() => handleChangeRole(emp._id)}
+                          >
+                            Change role
+                          </button>
+                          <button 
+                            className="btn btn-outline-secondary btn-sm rounded-3 px-3 fw-semibold"
+                            onClick={() => delEmployeeToSprint(emp._id)}
+                          >
+                            Remove
+                          </button>
+                        </div>
+
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="text-muted italic">No one assigned yet.</p>
+              )}
+            </div>
+
+            <hr className="my-5 text-secondary opacity-25" />
+
+            {/* SECTION 2: Add New Members */}
+            <div>
+              <h5 className="fw-bold mb-3 text-dark">Add to team</h5>
+              <p className="small text-muted mb-3">Select an employee from the company directory to add to this sprint.</p>
               
-            >
-              <div className="d-flex align-items-center">
-                <div className="bg-light text-dark rounded-circle d-flex align-items-center justify-content-center me-3 border" style={{width: '32px', height: '32px', fontSize: '0.8rem'}}>
-                  {emp.name.charAt(0)}
-                </div>
-                <span>{emp.name} <small className="text-muted ms-2">({emp.role})</small></span>
+              <div className="list-group border rounded-3 overflow-auto" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                {allEmployees.filter(emp => !sprint.employees.some(existing => existing._id === emp._id))
+                  .map(emp => (
+                    <button 
+                      key={emp._id}
+                      className="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 border-light"
+                      onClick={() => addEmployeeToSprint(emp._id)}
+                    >
+                      <div className="d-flex align-items-center">
+                        <div className="bg-light text-dark rounded-circle d-flex align-items-center justify-content-center me-3 border" style={{width: '32px', height: '32px', fontSize: '0.8rem'}}>
+                          {emp.name.charAt(0)}
+                        </div>
+                        <span>{emp.name} <small className="text-muted ms-2">({emp.role})</small></span>
+                      </div>
+                      <span className="badge bg-primary rounded-pill px-3">+ Add</span>
+                    </button>
+                ))}
               </div>
-              <span className="badge bg-primary rounded-pill px-3">+ Add</span>
-            </button>
-        ))}
-      </div>
-    </div>
-  </div>
-)}
+            </div>
+          </div>
+        )}
 
 {activeTab === 'board' && (
   <div className="row g-4">
@@ -323,7 +400,16 @@ const handleOpenTaskModal = (status) => {
           </div>
 
           {/* THE ADD TASK BUTTON: Styled like your "Add Employee" buttons */}
-          
+          {status === 'todo' && (
+            <button 
+              className="btn btn-white text-dark d-flex flex-column align-items-center justify-content-center p-3 rounded-3 border fw-bold shadow-sm mx-auto mt-8"
+              style={{ width: '350px', height: '100px', borderStyle: 'solid' }}
+              onClick={() => handleOpenTaskModal('todo')}
+            >
+              <span className="fs-3">+</span>
+              <span className="small">Add task</span>
+            </button>
+          )}
         </div>
       </div>
     ))}
