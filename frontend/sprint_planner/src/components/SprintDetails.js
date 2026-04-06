@@ -4,7 +4,10 @@ import axios from 'axios';
 import AddTaskModal from '../modals/AddTaskModal';
 import EditSprintModal from '../modals/EditSprintModal';
 import EditTaskModal from '../modals/EditTaskModals';
+<<<<<<< HEAD
 import GanttChart from './GanttChart';
+=======
+>>>>>>> 6bbf1304e98bf35eee4fdf3c861631b6d9b097da
 
 const SprintDetails = () => {
   const { id } = useParams();
@@ -19,7 +22,11 @@ const SprintDetails = () => {
   // State to remember which column we are adding to
 const [selectedStatus, setSelectedStatus] = useState('todo');
 
+<<<<<<< HEAD
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
+=======
+const [showEditTaskModal, setShowEditTaskModal] = useState(false);
+>>>>>>> 6bbf1304e98bf35eee4fdf3c861631b6d9b097da
   const [taskToEdit, setTaskToEdit] = useState(null);
 
 
@@ -124,8 +131,13 @@ if (!sprint) {
  const delEmployeeToSprint = async (empId) => {
     try {
       // We send a PUT request to the backend with the Employee's ID
+<<<<<<< HEAD
       const response = await axios.put(`http://localhost:8000/sprint/${id}/remove-employee`, {
         employeeId: empId
+=======
+      const response = await axios.delete(`http://localhost:8000/sprint/${id}`, {
+        employeeId: null
+>>>>>>> 6bbf1304e98bf35eee4fdf3c861631b6d9b097da
       });
       
       // We update the local state with the new data from the server
@@ -193,7 +205,11 @@ const handleOpenTaskModal = (status) => {
           <button 
             className="btn btn-outline-secondary btn-sm px-3 mx-2" 
             onClick={handleMarkComplete}
+<<<<<<< HEAD
             disabled={sprint.status === 'completed'} // Disable if already done 
+=======
+            disabled={sprint.status === 'completed'} // Disable if already done
+>>>>>>> 6bbf1304e98bf35eee4fdf3c861631b6d9b097da
           >
             Mark complete
           </button>
@@ -255,6 +271,7 @@ const handleOpenTaskModal = (status) => {
           </div>
         )}
 
+<<<<<<< HEAD
      {activeTab === 'team' && (
           <div className="py-2">
             {/* Header section with Stats */}
@@ -263,6 +280,27 @@ const handleOpenTaskModal = (status) => {
               <span className="text-muted small">
                 {sprint.employees.length} of {allEmployees.length} company employees
               </span>
+=======
+        {activeTab === 'team' && (
+  <div className="card border-0 shadow-sm p-4">
+    {/* SECTION 1: Current Assigned Members */}
+    <div className="mb-5">
+      <h5 className="fw-bold mb-4 text-dark">Assigned members</h5>
+      <div className="list-group list-group-flush">
+        {sprint.employees && sprint.employees.length > 0 ? (
+          sprint.employees.map(emp => (
+            <div key={emp._id} className="list-group-item d-flex justify-content-between align-items-center py-3 border-light px-0">
+              <div className="d-flex align-items-center">
+                <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 fw-bold" style={{width: '40px', height: '40px'}}>
+                  {emp.name.charAt(0)}
+                </div>
+                <div>
+                  <div className="fw-bold">{emp.name}</div>
+                  <div className="small text-muted">{emp.role}</div>
+                </div>
+              </div>
+              <button className="btn btn-link text-danger text-decoration-none btn-sm "onClick={() => delEmployeeToSprint(emp._id)}>Remove</button>
+>>>>>>> 6bbf1304e98bf35eee4fdf3c861631b6d9b097da
             </div>
 
             <div className="assigned-members-list">
@@ -287,6 +325,7 @@ const handleOpenTaskModal = (status) => {
                           </div>
                         </div>
 
+<<<<<<< HEAD
                         {/* Role Badge Section */}
                         <div className="px-3 text-center" style={{ flex: '1' }}>
                           <span className="badge rounded-pill bg-primary-subtle text-primary px-3 fw-medium">
@@ -356,6 +395,28 @@ const handleOpenTaskModal = (status) => {
                       <span className="badge bg-primary rounded-pill px-3">+ Add</span>
                     </button>
                 ))}
+=======
+    {/* SECTION 2: Add New Members (Now Below) */}
+    <div>
+      <h5 className="fw-bold mb-3 text-dark">Add to team</h5>
+      <p className="small text-muted mb-3">Select an employee from the company directory to add to this sprint.</p>
+      
+      <div className="list-group border rounded-3 overflow-auto" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+        {/* Optional: Filter out people already in the sprint */}
+        {allEmployees.filter(emp => !sprint.employees.some(existing => existing._id === emp._id))
+          .map(emp => (
+            <button 
+              key={emp._id}
+              className="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 border-light"
+              onClick={() => addEmployeeToSprint(emp._id)}
+              
+            >
+              <div className="d-flex align-items-center">
+                <div className="bg-light text-dark rounded-circle d-flex align-items-center justify-content-center me-3 border" style={{width: '32px', height: '32px', fontSize: '0.8rem'}}>
+                  {emp.name.charAt(0)}
+                </div>
+                <span>{emp.name} <small className="text-muted ms-2">({emp.role})</small></span>
+>>>>>>> 6bbf1304e98bf35eee4fdf3c861631b6d9b097da
               </div>
             </div>
           </div>
@@ -417,6 +478,7 @@ const handleOpenTaskModal = (status) => {
   </div>
 )}
 
+<<<<<<< HEAD
 {activeTab === 'gantt' && (
   <div className="py-2">
     <div className="d-flex justify-content-between align-items-center mb-4">
@@ -430,6 +492,8 @@ const handleOpenTaskModal = (status) => {
 )}
 
 
+=======
+>>>>>>> 6bbf1304e98bf35eee4fdf3c861631b6d9b097da
 <EditTaskModal 
         show={showEditTaskModal} 
         onClose={() => setShowEditTaskModal(false)} 
