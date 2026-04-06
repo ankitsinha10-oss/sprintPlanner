@@ -73,7 +73,6 @@ router.put("/:id/remove-employee", async (req, res) => {
   try {
     const { employeeId } = req.body;
     
-    // $pull removes the specific ID from the employees array
     const updatedSprint = await Sprint.findByIdAndUpdate(
       req.params.id,
       { $pull: { employees: employeeId } },

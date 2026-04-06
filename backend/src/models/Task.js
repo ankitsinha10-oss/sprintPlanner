@@ -15,7 +15,7 @@ const taskSchema = new mongoose.Schema(
       ref: "Sprint",
       required: true
   },
-   // Link to the Employee (Assigned to)
+   // Link to the Employee (Assigned to) 
     assignedTo: {
 
       type: mongoose.Schema.Types.ObjectId,

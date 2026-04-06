@@ -4,6 +4,7 @@ import axios from 'axios';
 import AddTaskModal from '../modals/AddTaskModal';
 import EditSprintModal from '../modals/EditSprintModal';
 import EditTaskModal from '../modals/EditTaskModals';
+import GanttChart from './GanttChart';
 
 const SprintDetails = () => {
   const { id } = useParams();
@@ -15,10 +16,10 @@ const SprintDetails = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   // State to control the Task Modal visibility
   const [showTaskModal, setShowTaskModal] = useState(false);
-// State to remember which column we are adding to
+  // State to remember which column we are adding to
 const [selectedStatus, setSelectedStatus] = useState('todo');
 
-const [showEditTaskModal, setShowEditTaskModal] = useState(false);
+  const [showEditTaskModal, setShowEditTaskModal] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState(null);
 
 
@@ -192,7 +193,7 @@ const handleOpenTaskModal = (status) => {
           <button 
             className="btn btn-outline-secondary btn-sm px-3 mx-2" 
             onClick={handleMarkComplete}
-            disabled={sprint.status === 'completed'} // Disable if already done
+            disabled={sprint.status === 'completed'} // Disable if already done 
           >
             Mark complete
           </button>
@@ -415,6 +416,19 @@ const handleOpenTaskModal = (status) => {
     ))}
   </div>
 )}
+
+{activeTab === 'gantt' && (
+  <div className="py-2">
+    <div className="d-flex justify-content-between align-items-center mb-4">
+       <h5 className="fw-bold mb-0">Timeline View</h5>
+       <span className="text-muted small">Daily progress distribution</span>
+    </div>
+    
+    {/* Render the Gantt Component */}
+    <GanttChart sprint={sprint} tasks={tasks} />
+  </div>
+)}
+
 
 <EditTaskModal 
         show={showEditTaskModal} 
