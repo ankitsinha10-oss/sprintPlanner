@@ -67,10 +67,11 @@ const GanttChart = ({ sprint, tasks }) => {
                         <td key={index} className="p-0 position-relative" style={{ height: '50px' }}>
                           {active && (
                             <div 
-                              className={`position-absolute top-50 start-0 translate-middle-y rounded-pill shadow-sm px-2 d-flex align-items-center justify-content-center text-white small fw-bold ${
+                              className={`position-absolute top-50 translate-middle-y rounded-pill shadow-sm px-2 d-flex align-items-center justify-content-center text-white small fw-bold ${
                                 task.status === 'completed' ? 'bg-success' : 'bg-primary'
                               }`}
-                              style={{ height: '24px', width: '100px', zIndex: 2, fontSize: '10px', left: '5px' }}
+                            //   start-0 
+                              style={{ height: '24px', width: '100px', zIndex: 2, fontSize: '10px', left: '10px' }}
                             >
                               {task.taskname.substring(0, 10)}...
                             </div>

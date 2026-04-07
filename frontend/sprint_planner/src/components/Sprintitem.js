@@ -5,7 +5,14 @@ import { useNavigate } from 'react-router-dom';
 const SprintItem = (props) => {
     
     const { sprint } = props;
+    const { sprintTasks = [] } = props;
+    
      const navigate = useNavigate(); 
+
+     // 2. Calculate the progress
+    const total = sprintTasks.length;
+    const completed = sprintTasks.filter(t => t.status === 'completed').length;
+    const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
 
     const handleViewDetails = () => {
         navigate(`/sprint/${sprint._id}`);}
@@ -21,6 +28,22 @@ const SprintItem = (props) => {
                         <strong>Goal:</strong> {sprint.goal} <br/> 
                         <strong>Status:</strong> <span className="badge bg-success">{sprint.status}</span>
                     </p>
+
+{/* --- ADDED PROGRESS BAR START --- */}
+                    <div className="progress mb-2" style={{ height: '10px' }}>
+                        <div 
+                            className="progress-bar bg-primary" 
+                            role="progressbar" 
+                            style={{ width: `${percent}%`, transition: 'width 0.5s' }}
+                        ></div>
+                    </div>
+                    <div className="d-flex justify-content-between mb-3">
+                        <small className="text-muted fw-bold">{percent}% done</small>
+                        <small className="text-muted">{completed}/{total} tasks</small>
+                    </div>
+                    {/* --- ADDED PROGRESS BAR END --- */}
+
+
                     <button className="btn btn-primary btn-sm">Edit Sprint</button>
                 </div>
             </div>

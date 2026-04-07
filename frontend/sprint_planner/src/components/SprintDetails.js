@@ -4,10 +4,7 @@ import axios from 'axios';
 import AddTaskModal from '../modals/AddTaskModal';
 import EditSprintModal from '../modals/EditSprintModal';
 import EditTaskModal from '../modals/EditTaskModals';
-<<<<<<< HEAD
 import GanttChart from './GanttChart';
-=======
->>>>>>> 6bbf1304e98bf35eee4fdf3c861631b6d9b097da
 
 const SprintDetails = () => {
   const { id } = useParams();
@@ -22,11 +19,7 @@ const SprintDetails = () => {
   // State to remember which column we are adding to
 const [selectedStatus, setSelectedStatus] = useState('todo');
 
-<<<<<<< HEAD
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
-=======
-const [showEditTaskModal, setShowEditTaskModal] = useState(false);
->>>>>>> 6bbf1304e98bf35eee4fdf3c861631b6d9b097da
   const [taskToEdit, setTaskToEdit] = useState(null);
 
 
@@ -131,13 +124,8 @@ if (!sprint) {
  const delEmployeeToSprint = async (empId) => {
     try {
       // We send a PUT request to the backend with the Employee's ID
-<<<<<<< HEAD
       const response = await axios.put(`http://localhost:8000/sprint/${id}/remove-employee`, {
         employeeId: empId
-=======
-      const response = await axios.delete(`http://localhost:8000/sprint/${id}`, {
-        employeeId: null
->>>>>>> 6bbf1304e98bf35eee4fdf3c861631b6d9b097da
       });
       
       // We update the local state with the new data from the server
@@ -205,11 +193,7 @@ const handleOpenTaskModal = (status) => {
           <button 
             className="btn btn-outline-secondary btn-sm px-3 mx-2" 
             onClick={handleMarkComplete}
-<<<<<<< HEAD
             disabled={sprint.status === 'completed'} // Disable if already done 
-=======
-            disabled={sprint.status === 'completed'} // Disable if already done
->>>>>>> 6bbf1304e98bf35eee4fdf3c861631b6d9b097da
           >
             Mark complete
           </button>
@@ -248,30 +232,101 @@ const handleOpenTaskModal = (status) => {
       {/* Tab Content */}
       <div className="tab-content">
         {activeTab === 'overview' && (
+  <div className="animate__animated animate__fadeIn">
+    {/* TOP SECTION: Goal and Dates */}
+    <div className="row g-4 mb-4">
+      <div className="col-lg-8">
+        <div className="card border-0 shadow-sm p-4 h-100 rounded-4">
+          <h6 className="text-uppercase text-muted fw-bold small mb-3">Sprint Goal</h6>
+          <p className="fs-5 text-dark" style={{ lineHeight: '1.6' }}>
+            {sprint.goal || "No goal defined for this sprint."}
+          </p>
+        </div>
+      </div>
 
-          <div className="row g-4">
-            <div className="col-md-8">
-              <div className="card border-0 shadow-sm p-4 mb-4">
-                <h6 className="text-uppercase text-muted fw-bold small mb-3">Sprint Goal</h6>
-                <p className="lead">{sprint.goal || "No goal defined for this sprint."}</p>
+      <div className="col-lg-4">
+        <div className="card border-0 shadow-sm p-4 h-100 rounded-4 position-relative">
+          <div className="row h-100">
+            <div className="col-7">
+              <div className="mb-4">
+                <small className="text-muted d-block mb-1">Start Date</small>
+                <h6 className="fw-bold mb-0">{new Date(sprint.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</h6>
+              </div>
+              <div>
+                <small className="text-muted d-block mb-1">End Date</small>
+                <h6 className="fw-bold mb-0">{new Date(sprint.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</h6>
               </div>
             </div>
-            <div className="col-md-4">
-                <div className="card border-0 shadow-sm p-4">
-                    <div className="mb-3">
-                        <small className="text-muted">Start Date</small>
-                        <p className="fw-bold">{new Date(sprint.startDate).toLocaleDateString()}</p>
-                    </div>
-                    <div className="mb-0">
-                        <small className="text-muted">End Date</small>
-                        <p className="fw-bold">{new Date(sprint.endDate).toLocaleDateString()}</p>
-                    </div>
-                </div>
+            
+            {/* The "Days Remaining" Box */}
+            <div className="col-5 d-flex align-items-center">
+              <div className="w-100 p-3 rounded-4 text-center" style={{ backgroundColor: '#EEF2FF', border: '1px solid #C7D2FE' }}>
+                <h2 className="fw-bold text-primary mb-0">
+                  {Math.max(0, Math.ceil((new Date(sprint.endDate) - new Date()) / (1000 * 60 * 60 * 24)))}
+                </h2>
+                <small className="text-primary fw-medium d-block" style={{ fontSize: '11px', lineHeight: '1.2' }}>days remaining</small>
+              </div>
             </div>
           </div>
-        )}
+        </div>
+      </div>
+    </div>
 
-<<<<<<< HEAD
+    {/* METRIC CARDS SECTION */}
+    <div className="row g-4 mb-4">
+      {[
+        { label: 'Total tasks', val: tasks.length, sub: `across ${sprint.employees.length} members`, color: 'text-dark' },
+        { label: 'Completed', val: tasks.filter(t => t.status === 'completed').length, sub: `${Math.round((tasks.filter(t => t.status === 'completed').length / (tasks.length || 1)) * 100)}% of sprint`, color: 'text-success' },
+        { label: 'In progress', val: tasks.filter(t => t.status === 'inprogress').length, sub: 'due this week', color: 'text-warning' },
+        { label: 'Overdue', val: tasks.filter(t => t.dueDate && new Date(t.dueDate) < new Date() && t.status !== 'completed').length, sub: 'past due date', color: 'text-danger' }
+      ].map((card, idx) => (
+        <div className="col-md-3" key={idx}>
+          <div className="card border-0 shadow-sm p-4 rounded-4 h-100 bg-white">
+            <small className="text-muted text-uppercase fw-bold mb-2" style={{ fontSize: '11px', letterSpacing: '0.5px' }}>{card.label}</small>
+            <h1 className={`fw-bold mb-1 ${card.color}`}>{card.val}</h1>
+            <small className="text-muted">{card.sub}</small>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {/* PROGRESS BY MEMBER SECTION */}
+    <div className="card border-0 shadow-sm p-4 rounded-4 bg-white">
+      <h6 className="text-uppercase text-muted fw-bold small mb-4">Progress by Member</h6>
+      <div className="px-2">
+        {sprint.employees.map(emp => {
+          const stats = getEmployeeTaskStats(emp._id);
+          // Determine bar color based on your reference image colors
+          const barColor = stats.percent >= 80 ? '#10B981' : stats.percent >= 50 ? '#B45309' : '#B91C1C';
+          
+          return (
+            <div key={emp._id} className="row align-items-center mb-4">
+              <div className="col-md-2">
+                <span className="fw-semibold text-dark">{emp.name}</span>
+              </div>
+              <div className="col-md-9">
+                <div className="progress rounded-pill" style={{ height: '10px', backgroundColor: '#F3F4F6' }}>
+                  <div 
+                    className="progress-bar rounded-pill" 
+                    style={{ 
+                      width: `${stats.percent}%`, 
+                      backgroundColor: barColor,
+                      transition: 'width 1.5s cubic-bezier(0.4, 0, 0.2, 1)' 
+                    }}
+                  ></div>
+                </div>
+              </div>
+              <div className="col-md-1 text-end text-muted fw-medium">
+                {Math.round(stats.percent)}%
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+)}
+
      {activeTab === 'team' && (
           <div className="py-2">
             {/* Header section with Stats */}
@@ -280,27 +335,6 @@ const handleOpenTaskModal = (status) => {
               <span className="text-muted small">
                 {sprint.employees.length} of {allEmployees.length} company employees
               </span>
-=======
-        {activeTab === 'team' && (
-  <div className="card border-0 shadow-sm p-4">
-    {/* SECTION 1: Current Assigned Members */}
-    <div className="mb-5">
-      <h5 className="fw-bold mb-4 text-dark">Assigned members</h5>
-      <div className="list-group list-group-flush">
-        {sprint.employees && sprint.employees.length > 0 ? (
-          sprint.employees.map(emp => (
-            <div key={emp._id} className="list-group-item d-flex justify-content-between align-items-center py-3 border-light px-0">
-              <div className="d-flex align-items-center">
-                <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 fw-bold" style={{width: '40px', height: '40px'}}>
-                  {emp.name.charAt(0)}
-                </div>
-                <div>
-                  <div className="fw-bold">{emp.name}</div>
-                  <div className="small text-muted">{emp.role}</div>
-                </div>
-              </div>
-              <button className="btn btn-link text-danger text-decoration-none btn-sm "onClick={() => delEmployeeToSprint(emp._id)}>Remove</button>
->>>>>>> 6bbf1304e98bf35eee4fdf3c861631b6d9b097da
             </div>
 
             <div className="assigned-members-list">
@@ -325,7 +359,6 @@ const handleOpenTaskModal = (status) => {
                           </div>
                         </div>
 
-<<<<<<< HEAD
                         {/* Role Badge Section */}
                         <div className="px-3 text-center" style={{ flex: '1' }}>
                           <span className="badge rounded-pill bg-primary-subtle text-primary px-3 fw-medium">
@@ -395,28 +428,6 @@ const handleOpenTaskModal = (status) => {
                       <span className="badge bg-primary rounded-pill px-3">+ Add</span>
                     </button>
                 ))}
-=======
-    {/* SECTION 2: Add New Members (Now Below) */}
-    <div>
-      <h5 className="fw-bold mb-3 text-dark">Add to team</h5>
-      <p className="small text-muted mb-3">Select an employee from the company directory to add to this sprint.</p>
-      
-      <div className="list-group border rounded-3 overflow-auto" style={{ maxHeight: '300px', overflowY: 'auto' }}>
-        {/* Optional: Filter out people already in the sprint */}
-        {allEmployees.filter(emp => !sprint.employees.some(existing => existing._id === emp._id))
-          .map(emp => (
-            <button 
-              key={emp._id}
-              className="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 border-light"
-              onClick={() => addEmployeeToSprint(emp._id)}
-              
-            >
-              <div className="d-flex align-items-center">
-                <div className="bg-light text-dark rounded-circle d-flex align-items-center justify-content-center me-3 border" style={{width: '32px', height: '32px', fontSize: '0.8rem'}}>
-                  {emp.name.charAt(0)}
-                </div>
-                <span>{emp.name} <small className="text-muted ms-2">({emp.role})</small></span>
->>>>>>> 6bbf1304e98bf35eee4fdf3c861631b6d9b097da
               </div>
             </div>
           </div>
@@ -478,7 +489,6 @@ const handleOpenTaskModal = (status) => {
   </div>
 )}
 
-<<<<<<< HEAD
 {activeTab === 'gantt' && (
   <div className="py-2">
     <div className="d-flex justify-content-between align-items-center mb-4">
@@ -492,8 +502,6 @@ const handleOpenTaskModal = (status) => {
 )}
 
 
-=======
->>>>>>> 6bbf1304e98bf35eee4fdf3c861631b6d9b097da
 <EditTaskModal 
         show={showEditTaskModal} 
         onClose={() => setShowEditTaskModal(false)} 

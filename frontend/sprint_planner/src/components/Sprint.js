@@ -6,20 +6,24 @@ import AddSprintModal from '../modals/AddSprintModal'; // Ensure this path is co
 const Sprint = () => {
   const [sprints, setSprints] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [tasks, setTasks] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
   // 1. Function to fetch all sprints from Backend
-  const fetchSprints = async () => {
+const fetchSprints = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/sprint'); 
-      setSprints(response.data);
+      const [sprintRes, taskRes] = await Promise.all([
+        axios.get('http://localhost:8000/sprint'),
+        axios.get('http://localhost:8000/tasks') // Ensure this matches your backend route
+      ]);
+      setSprints(sprintRes.data);
+      setTasks(taskRes.data); // 3. SET TASKS HERE
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching sprints:", error);
+      console.error("Error fetching data:", error);
       setLoading(false);
     }
   };
-
   // 2. Run fetch on component load
   useEffect(() => {
     fetchSprints();
@@ -48,7 +52,7 @@ const Sprint = () => {
           onClick={() => setShowModal(true)}
         >
           + New sprint
-        </button>
+        </button>   
       </div>
 
       
@@ -56,7 +60,11 @@ const Sprint = () => {
       {/* Sprint Grid */}
       <div className="row">
         {sprints.map((sprint) => (
-          <SprintItem key={sprint._id} sprint={sprint} />
+          <SprintItem 
+            key={sprint._id} 
+            sprint={sprint} 
+            sprintTasks={tasks.filter(t => t.sprint === sprint._id)} // PASS THE FILTERED TASKS HERE
+          />
         ))}
       </div>
 
