@@ -20,7 +20,7 @@ const taskSchema = new mongoose.Schema(
 
       type: mongoose.Schema.Types.ObjectId,
 
-      ref: "Employee" // Make sure your Employee model is named "Employee"
+      ref: "Employee" 
   },
     desc: {
       type: String,

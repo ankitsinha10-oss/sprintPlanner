@@ -30,7 +30,7 @@ const GanttChart = ({ sprint, tasks }) => {
               <th style={{ minWidth: '200px' }} className="ps-4 py-3 text-muted small text-uppercase">Task / Member</th>
               <th className="text-muted small text-uppercase">Status</th>
               {sprintDates.map((date, index) => (
-                <th key={index} className="text-center small fw-bold" style={{ minWidth: '40px' }}>
+                <th key={index} className="text-center small fw-bold" style={{ minWidth: '80px' }}>
                   {date.getDate()}
                 </th>
               ))}
@@ -59,9 +59,9 @@ const GanttChart = ({ sprint, tasks }) => {
                       </span>
                     </td>
                     {sprintDates.map((date, index) => {
-                      // Logic: If task spans multiple days, you'd calculate width. 
-                      // Simple version: Show a dot or bar on the specific Due Date
-                      const active = isTaskOnDate(task.dueDate || task.updatedAt, date);
+                                                                                                                                                                                                            // Logic: If task spans multiple days, you'd calculate width. 
+                                                                                                                                                                                                            // Simple version: Show a dot or bar on the specific Due Date
+                      const active = isTaskOnDate(task.endDate || task.updatedAt, date);
                       
                       return (
                         <td key={index} className="p-0 position-relative" style={{ height: '50px' }}>
@@ -70,8 +70,8 @@ const GanttChart = ({ sprint, tasks }) => {
                               className={`position-absolute top-50 translate-middle-y rounded-pill shadow-sm px-2 d-flex align-items-center justify-content-center text-white small fw-bold ${
                                 task.status === 'completed' ? 'bg-success' : 'bg-primary'
                               }`}
-                            //   start-0 
-                              style={{ height: '24px', width: '100px', zIndex: 2, fontSize: '10px', left: '10px' }}
+                            
+                              style={{ height: '24px', width: '100px', zIndex: 2, fontSize: '10px', left: '25px' }}
                             >
                               {task.taskname.substring(0, 10)}...
                             </div>

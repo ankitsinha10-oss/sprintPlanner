@@ -71,17 +71,17 @@ const AddTaskModal = ({ show, onClose, sprintId, sprintEmployees, initialStatus,
                 </select>
               </div>
               <div className="mb-3">
-                <label className="form-label">Due Date</label>
+                <label className="form-label">End Date</label>
                 <input type="date" className="form-control" onChange={(e) => setTaskData({...taskData, dueDate: e.target.value})} />
               </div>
               <div className="mb-3">
                 <label className="form-label">Start Date</label>
                 <input type="date" className="form-control" onChange={(e) => setTaskData({...taskData, startDate: e.target.value})} />
               </div>
-              <div className="mb-3">
+              {/* <div className="mb-3">
                 <label className="form-label">End Date</label>
                 <input type="date" className="form-control" onChange={(e) => setTaskData({...taskData, endDate: e.target.value})} />
-              </div>
+              </div> */}
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-light" onClick={onClose}>Cancel</button>
